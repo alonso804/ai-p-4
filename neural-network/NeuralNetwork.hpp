@@ -20,12 +20,15 @@ class NeuralNetwork {
     this->layers[0][layers[0].size() - 1].output = 1;
 
     for (unsigned layerIdx = 1; layerIdx < this->numLayers; layerIdx++) {
-      //cout << this->layers[layerIdx].size() << endl;
       Layer* prevLayer = &this->layers[layerIdx - 1];
       for (unsigned neuronIdx = 0; neuronIdx < this->layers[layerIdx].size() - 1; neuronIdx++) {
         this->layers[layerIdx][neuronIdx].forward(prevLayer, funct);
       }
     }
+  }
+
+  void propagateBackward() {
+
   }
 
 public:
@@ -64,7 +67,13 @@ public:
       this->propagateForward(*inputs[i]);
       //cout << (*inputs[i]).size() << endl;
       //this->propagateBackward(*inputs[i]);
+      for (auto i : this->layers[this->layers.size() - 1]) {
+        cout << i.output << endl;
+      }
+      cout << endl;
     }
+
+    //cout << this->layers[this->layers.size() - 1].size() << endl;
   }
 
   virtual ~NeuralNetwork() {}

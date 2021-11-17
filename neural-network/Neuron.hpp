@@ -34,25 +34,18 @@ public:
 
     this->output = 0;
     this->idx = idx;
-    //cout << weights << endl;
   }
 
   void forward(Layer* prevLayer, double (*funct)(double)) {
     double sum = 0;
-
-    /*
-     *cout << prevLayer->size() << endl;
-     *cout << (*prevLayer)[0].weights.size() << endl;
-     *cout << this->idx << endl << endl;
-     */
 
     for (unsigned i = 0; i < prevLayer->size(); i++) {
       sum += (*prevLayer)[i].output * (*prevLayer)[i].weights[this->idx];
     }
 
     this->output = funct(sum);
-    cout << sum << endl;
-    cout << this->output << endl;
+    //cout << sum << endl;
+    //cout << this->output << endl;
   }
 
   friend class NeuralNetwork;
