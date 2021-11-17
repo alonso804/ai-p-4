@@ -17,7 +17,6 @@ using RowVector = Eigen::RowVectorXf;
 
 using out_t = tuple<vector<RowVector*>, vector<RowVector*>>;
 
-
 class CSV {
 public:
 	static out_t read(const string& filename) {
@@ -26,6 +25,7 @@ public:
 
 		vector<RowVector*> data;
 		vector<RowVector*> output;
+
 		string line;
 		string word;
 
