@@ -1,15 +1,21 @@
 #ifndef ErrorFunct_H
 #define ErrorFunct_H
 
+#include <iostream>
+
 #include <eigen3/Eigen/Eigen>
 
+using namespace std;
+
+using Matrix = Eigen::MatrixXd;
 using RowVector = Eigen::RowVectorXd;
 
-double MSE(RowVector y_pred, RowVector y_real) {
+double MSE(Matrix y_pred, RowVector y_real) {
 	double result = 0;
 
 	for (std::size_t i = 0; i < y_pred.size(); i++) {
-		result += pow(y_pred[i] - y_real[i], 2);
+		cout << y_pred(i) << endl;
+		result += pow(y_pred(i, 0) - y_real[i], 2);
 	}
 
 	result /= y_pred.size();

@@ -2,6 +2,10 @@
 #define ActFuncts_H
 
 #include <cmath>
+#include <eigen3/Eigen/Eigen>
+
+using Matrix = Eigen::MatrixXd;
+using RowVector = Eigen::RowVectorXd;
 
 double Tanh(double x) {
 	return tanh(x);

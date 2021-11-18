@@ -10,7 +10,27 @@ class NeuralNetwork {
 	Layers layers;
 	string cost_funct;
 	double learning_rate;
-  double (*cost)(RowVector, RowVector);
+  double (*cost)(Matrix, RowVector);
+
+	Matrix activation(Matrix x, double (*f)(double)) {
+		for (unsigned i = 0; i < x.rows(); i++) {
+			for (unsigned j = 0; j < x.cols(); j++) {
+				x(i, j) = f(x(i, j));
+			}
+		}
+
+		return x;
+	}
+
+	Matrix derivate(Matrix x, double (*d)(double)) {
+		for (unsigned i = 0; i < x.rows(); i++) {
+			for (unsigned j = 0; j < x.cols(); j++) {
+				x(i, j) = d(x(i, j));
+			}
+		}
+
+		return x;
+	}
 
 public:
 	NeuralNetwork() = default;
@@ -25,33 +45,21 @@ public:
 		if (cost_funct == "mse") {
 			this->cost = &MSE;
 		}
-
-		/*
-		 *cout << layers[0] << endl << endl;
-		 *cout << layers[0].b << endl << endl;
-		 *cout << layers[0].w << endl;
-		 */
 	}
 
 	void fit(Matrix x, RowVector y) {
-		//cout << x << endl;
-		cout << y << endl;
-		//vector<pair<double, vector<RowVector*>>> out = {make_pair(0, x)};
+		vector<pair<Matrix, Matrix>> out = {make_pair(Matrix(0, 0), x)};
 
-		/*
-		 *for (auto& layer : layers) {
-		 *  cout << layer.w << endl;
-		 *}
-		 */
-		/*
-		 *for (size_t  i = 0; i < this->layers.size(); i++) {
-		 *  //auto z = out.back().second * 
-		 *}
-		 *for (auto i : out[0].second) {
-		 *  cout << *(i) << endl;
-		 *  cout << *(i) << endl;
-		 *}
-		 */
+		for (auto& layer : this->layers) {
+			Matrix z = MatrixSum(out.back().second * layer.w, layer.b);
+			Matrix a = activation(z, layer.funct);
+
+			out.push_back(make_pair(z, a));
+		}
+
+		cout << "Calculating cost ...\n";
+		cout << "Cost: "<< this->cost(out.back().second, y) << endl;
+		cout << "Finish \n";
 	}
 };
 

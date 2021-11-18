@@ -31,7 +31,7 @@ public:
 	Layer() = default;
 
 	Layer(unsigned n_connections, unsigned n_neurons, string act_f) {
-    assert(act_f == "tanh" || act_f == "sigmoide" || act_f == "relu");
+    assert(act_f == "tanh" || act_f == "sigm" || act_f == "relu");
 
     this->act_f = act_f;
 
@@ -40,7 +40,7 @@ public:
       this->derivative = &TanhDerivative;
     }
 
-    if (act_f == "sigmoide") {
+    if (act_f == "sigm") {
       this->funct = &Sigmoide;
       this->derivative = &SigmoideDerivate;
     }
@@ -67,6 +67,16 @@ ostream& operator << (ostream& os, const Layer& l) {
   os << "Activaton Function: " << l.act_f;
 
   return os;
+}
+
+Matrix MatrixSum(Matrix w, const Matrix& b) {
+  for (int i = 0; i < w.rows(); i++) {
+    for (int j = 0; j < w.cols(); j++) {
+      w(i, j) += b(0, j);
+    }
+  }
+
+  return w;
 }
 
 #endif //Layer_H
