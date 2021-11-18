@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
 	topology.push_back(dimensions);
 	topology.push_back(dimensions / 2);
 	topology.push_back(dimensions / 4);
-	topology.push_back(1);
+	topology.push_back(24);
 
 	NeuralNetwork nn(topology, "tanh");
 	nn.fit(x, y);

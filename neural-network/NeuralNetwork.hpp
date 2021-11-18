@@ -65,8 +65,6 @@ public:
   void fit(const vector<RowVector*>& inputs, vector<RowVector*> outputs) {
     for (unsigned i = 0; i < outputs.size(); i++) {
       this->propagateForward(*inputs[i]);
-      //cout << (*inputs[i]).size() << endl;
-      //this->propagateBackward(*inputs[i]);
       for (auto i : this->layers[this->layers.size() - 1]) {
         cout << i.output << endl;
       }
