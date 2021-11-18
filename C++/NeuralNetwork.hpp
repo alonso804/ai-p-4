@@ -4,10 +4,10 @@
 #include "Layer.hpp"
 #include "ErrorFunct.hpp"
 
-using Topology = vector<Layer>;
+using Layers = vector<Layer>;
 
 class NeuralNetwork {
-	Topology topology;
+	Layers layers;
 	string cost_funct;
 	double learning_rate;
   double (*cost)(RowVector, RowVector);
@@ -15,10 +15,10 @@ class NeuralNetwork {
 public:
 	NeuralNetwork() = default;
 
-	NeuralNetwork(Topology topology, string cost_funct, double learning_rate = 0.5) {
+	NeuralNetwork(Layers layers, string cost_funct, double learning_rate = 0.5) {
     assert(cost_funct == "mse");
 
-		this->topology = topology;
+		this->layers = layers;
 		this->learning_rate = learning_rate;
 		this->cost_funct = cost_funct;
 
@@ -27,14 +27,38 @@ public:
 		}
 
 		/*
-		 *for (auto t : topology) {
+		 *for (auto t : this->layers) {
 		 *  cout << t << endl << endl;
 		 *}
 		 */
 	}
 
 	void fit(vector<RowVector*> x, vector<RowVector*> y) {
-		vector<pair<double, double>> out = {make_pair(0, x)};
+		/*
+		 *for (auto& i : x) {
+		 *  cout << *i << endl;
+		 *}
+		 */
+
+		for (auto& i : y) {
+			cout << *i << endl;
+		}
+		vector<pair<double, vector<RowVector*>>> out = {make_pair(0, x)};
+
+		/*
+		 *for (auto& layer : layers) {
+		 *  cout << layer.w << endl;
+		 *}
+		 */
+		/*
+		 *for (size_t  i = 0; i < this->layers.size(); i++) {
+		 *  //auto z = out.back().second * 
+		 *}
+		 *for (auto i : out[0].second) {
+		 *  cout << *(i) << endl;
+		 *  cout << *(i) << endl;
+		 *}
+		 */
 	}
 };
 
