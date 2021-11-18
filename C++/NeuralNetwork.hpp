@@ -50,6 +50,7 @@ public:
 	void fit(Matrix x, RowVector y) {
 		vector<pair<Matrix, Matrix>> out = {make_pair(Matrix(0, 0), x)};
 
+		// Forward
 		for (auto& layer : this->layers) {
 			Matrix z = MatrixSum(out.back().second * layer.w, layer.b);
 			Matrix a = activation(z, layer.funct);
@@ -57,6 +58,13 @@ public:
 			out.push_back(make_pair(z, a));
 		}
 
+		// Reverse
+
+		/*
+		 *cout << out.back().second << endl;
+		 *cout << "Rows: " << out.back().second.rows() << endl;
+		 *cout << "Cols: " << out.back().second.cols() << endl;
+		 */
 		cout << "Calculating cost ...\n";
 		cout << "Cost: "<< this->cost(out.back().second, y) << endl;
 		cout << "Finish \n";

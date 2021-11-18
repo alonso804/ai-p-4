@@ -27,8 +27,8 @@ Layers createLayers(initializer_list<pair<unsigned, string>> topology) {
 
 int main(int argc, char *argv[]) {
 	//auto [x, y] = CSV::read("../data/train_normalize.csv");
-	auto [x, y] = CSV::read("../data/test_normalize.csv");
-	//auto [x, y] = CSV::read("../data/circle.csv");
+	//auto [x, y] = CSV::read("../data/test_normalize.csv");
+	auto [x, y] = CSV::read("../data/circle.csv");
 
 	const string act_f = "sigm";
 	//const string act_f = "tanh";
@@ -41,24 +41,24 @@ int main(int argc, char *argv[]) {
 	 *cout << "n_outputs: " <<  n_output << endl;
 	 */
 
-	auto layers = createLayers({
-		make_pair(dimensions, act_f),
-		make_pair(dimensions / 2, act_f),
-		make_pair(dimensions / 2, act_f),
-		make_pair(n_output, act_f),
-	});
-
 	/*
 	 *auto layers = createLayers({
-	 *  make_pair(2, act_f),
-	 *  make_pair(4, act_f),
-	 *  make_pair(8, act_f),
-	 *  make_pair(16, act_f),
-	 *  make_pair(8, act_f),
-	 *  make_pair(4, act_f),
-	 *  make_pair(1, act_f)
+	 *  make_pair(dimensions, act_f),
+	 *  make_pair(dimensions / 2, act_f),
+	 *  make_pair(dimensions / 2, act_f),
+	 *  make_pair(n_output, act_f),
 	 *});
 	 */
+
+	auto layers = createLayers({
+		make_pair(2, act_f),
+		make_pair(4, act_f),
+		make_pair(8, act_f),
+		make_pair(16, act_f),
+		make_pair(8, act_f),
+		make_pair(4, act_f),
+		make_pair(1, act_f)
+	});
 	
 	NeuralNetwork nn(layers, "mse");
 	nn.fit(x, y);
