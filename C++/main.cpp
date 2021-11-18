@@ -5,11 +5,11 @@
 #include <unordered_set>
 #include <utility>
 
-unsigned countUnique(vector<RowVector*> y) {
+unsigned countUnique(RowVector y) {
 	unordered_set<double> uniques;
 
 	for (int i = 0; i < y.size(); i++) {
-		uniques.insert(y[i]->coeffRef(0));
+		uniques.insert(y.coeffRef(i));
 	}
 
 	return uniques.size();
@@ -31,8 +31,13 @@ int main(int argc, char *argv[]) {
 	auto [x, y] = CSV::read("../data/circle.csv");
 
 	const string act_f = "tanh";
-	const unsigned dimensions = (*x[0]).size();
+	const unsigned dimensions = x.cols();
 	const unsigned n_output = countUnique(y);
+
+	/*
+	 *cout << "dimensions: " << dimensions << endl;
+	 *cout << "n_outputs: " <<  n_output << endl;
+	 */
 
 	/*
 	 *auto layers = createLayers({

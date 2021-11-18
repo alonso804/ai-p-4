@@ -27,23 +27,16 @@ public:
 		}
 
 		/*
-		 *for (auto t : this->layers) {
-		 *  cout << t << endl << endl;
-		 *}
+		 *cout << layers[0] << endl << endl;
+		 *cout << layers[0].b << endl << endl;
+		 *cout << layers[0].w << endl;
 		 */
 	}
 
-	void fit(vector<RowVector*> x, vector<RowVector*> y) {
-		/*
-		 *for (auto& i : x) {
-		 *  cout << *i << endl;
-		 *}
-		 */
-
-		for (auto& i : y) {
-			cout << *i << endl;
-		}
-		vector<pair<double, vector<RowVector*>>> out = {make_pair(0, x)};
+	void fit(Matrix x, RowVector y) {
+		//cout << x << endl;
+		cout << y << endl;
+		//vector<pair<double, vector<RowVector*>>> out = {make_pair(0, x)};
 
 		/*
 		 *for (auto& layer : layers) {
