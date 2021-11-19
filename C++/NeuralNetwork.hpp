@@ -12,26 +12,6 @@ class NeuralNetwork {
 	double learning_rate;
   double (*cost)(Matrix, RowVector);
 
-	Matrix activation(Matrix x, double (*f)(double)) {
-		for (unsigned i = 0; i < x.rows(); i++) {
-			for (unsigned j = 0; j < x.cols(); j++) {
-				x(i, j) = f(x(i, j));
-			}
-		}
-
-		return x;
-	}
-
-	Matrix derivate(Matrix x, double (*d)(double)) {
-		for (unsigned i = 0; i < x.rows(); i++) {
-			for (unsigned j = 0; j < x.cols(); j++) {
-				x(i, j) = d(x(i, j));
-			}
-		}
-
-		return x;
-	}
-
 public:
 	NeuralNetwork() = default;
 
@@ -53,21 +33,24 @@ public:
 		// Forward
 		for (auto& layer : this->layers) {
 			Matrix z = MatrixSum(out.back().second * layer.w, layer.b);
-			Matrix a = activation(z, layer.funct);
+			Matrix a = layer.funct(z);
+			cout << layer << endl << endl;
 
 			out.push_back(make_pair(z, a));
 		}
 
 		// Reverse
 
-		/*
-		 *cout << out.back().second << endl;
-		 *cout << "Rows: " << out.back().second.rows() << endl;
-		 *cout << "Cols: " << out.back().second.cols() << endl;
-		 */
-		cout << "Calculating cost ...\n";
-		cout << "Cost: "<< this->cost(out.back().second, y) << endl;
-		cout << "Finish \n";
+		//cout << out.back().first << endl;
+		cout << "Rows: " << out.back().first.rows() << endl;
+		cout << "Cols: " << out.back().first.cols() << endl;
+		cout << "Z: " << out.back().first.row(0) << endl;
+		cout << "A: " << out.back().second.row(0) << endl;
+		cout << "Sum: " << out.back().second.row(0).sum() << endl;
+		cout << endl;
+		//cout << "Calculating cost ...\n";
+		//cout << "Cost: "<< this->cost(out.back().second, y) << endl;
+		//cout << "Finish \n";
 	}
 };
 

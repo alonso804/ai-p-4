@@ -22,8 +22,8 @@ class Layer {
 	string act_f;
 	unsigned n_connections;
 	unsigned n_neurons;
-  double (*funct)(double);
-  double (*derivative)(double);
+  Matrix (*funct)(Matrix);
+  Matrix (*derivative)(Matrix);
 	Matrix b;
 	Matrix w;
 
@@ -31,23 +31,28 @@ public:
 	Layer() = default;
 
 	Layer(unsigned n_connections, unsigned n_neurons, string act_f) {
-    assert(act_f == "tanh" || act_f == "sigm" || act_f == "relu");
+    assert(act_f == "tanh" || act_f == "sigm" || act_f == "relu" || act_f == "softmax");
 
     this->act_f = act_f;
 
     if (act_f == "tanh") {
       this->funct = &Tanh;
-      this->derivative = &TanhDerivative;
+      this->derivative = &TanhD;
     }
 
     if (act_f == "sigm") {
-      this->funct = &Sigmoide;
-      this->derivative = &SigmoideDerivate;
+      this->funct = &Sigm;
+      this->derivative = &SigmD;
     }
 
     if (act_f == "relu") {
-      this->funct = &RELU;
-      this->derivative = &RELUDerivate;
+      this->funct = &Relu;
+      this->derivative = &ReluD;
+    }
+
+    if (act_f == "softmax") {
+      this->funct = &SoftMax;
+      this->derivative = &ReluD;
     }
 
 		this->n_connections = n_connections;

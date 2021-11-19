@@ -40,7 +40,8 @@ double MSE(Matrix y_pred, RowVector y_real) {
 }
 
 double MSE_Derivate(Matrix y_pred, RowVector y_real) {
-	return y_pred - y_pred;
+	return 0;
+	//return y_pred - y_pred;
 }
 
 #endif //ErrorFunct_H
