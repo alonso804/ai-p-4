@@ -1,18 +1,24 @@
 #include "CSV.hpp"
 #include "NeuralNetwork.hpp"
-#include <cstddef>
-#include <initializer_list>
-#include <unordered_set>
-#include <utility>
 
-unsigned countUnique(RowVector y) {
-	unordered_set<double> uniques;
+#include "prettyprint.hpp"
+
+map<double, unsigned> countUnique(RowVector y) {
+	set<double> uniques;
 
 	for (int i = 0; i < y.size(); i++) {
 		uniques.insert(y.coeffRef(i));
 	}
 
-	return uniques.size();
+	unsigned i = 0;
+
+	map<double, unsigned> mapper;
+
+	for (const auto& u : uniques) {
+		mapper[u] = i++;
+	}
+
+	return mapper;
 }
 
 Layers createLayers(initializer_list<pair<unsigned, string>> topology) {
@@ -26,42 +32,38 @@ Layers createLayers(initializer_list<pair<unsigned, string>> topology) {
 }
 
 int main(int argc, char *argv[]) {
-	//auto [x, y] = CSV::read("../data/train_normalize.csv");
+  const string act_f = "sigm";
+  //const string act_f = "tanh";
+  //const string act_f = "relu";
 	auto [x, y] = CSV::read("../data/test_normalize.csv");
-	//auto [x, y] = CSV::read("../data/circle.csv");
+	//auto [x, y] = CSV::read("../data/train_normalize.csv");
 
-	const string act_f = "sigm";
-	//const string act_f = "tanh";
-	//const string act_f = "relu";
 	const unsigned dimensions = x.cols();
-	const unsigned n_output = countUnique(y);
-
-	/*
-	 *cout << "dimensions: " << dimensions << endl;
-	 *cout << "n_outputs: " <<  n_output << endl;
-	 */
+	const map<double, unsigned> output_mapper = countUnique(y);
 
 	auto layers = createLayers({
 		make_pair(dimensions, act_f),
-		make_pair(dimensions / 2, act_f),
 		make_pair(dimensions / 2, "softmax"),
-		make_pair(n_output, ""),
+		make_pair(output_mapper.size(), ""),
 	});
 
-	/*
-	 *auto layers = createLayers({
-	 *  make_pair(2, act_f),
-	 *  make_pair(4, act_f),
-	 *  make_pair(8, act_f),
-	 *  make_pair(16, act_f),
-	 *  make_pair(8, act_f),
-	 *  make_pair(4, act_f),
-	 *  make_pair(1, act_f)
-	 *});
-	 */
+/*
+ *  auto [x, y] = CSV::read("../data/circle.csv");
+ *  const map<double, unsigned> output_mapper = countUnique(y);
+ *
+ *  auto layers = createLayers({
+ *    make_pair(2, act_f),
+ *    make_pair(4, act_f),
+ *    make_pair(8, act_f),
+ *    make_pair(16, act_f),
+ *    make_pair(8, act_f),
+ *    make_pair(4, act_f),
+ *    make_pair(1, act_f)
+ *  });
+ */
 	
 	NeuralNetwork nn(layers, "mse");
-	nn.fit(x, y);
+	nn.fit(x, y, output_mapper);
 	
 	return 0;
 }

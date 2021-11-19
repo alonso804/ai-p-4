@@ -10,7 +10,7 @@ class NeuralNetwork {
 	Layers layers;
 	string cost_funct;
 	double learning_rate;
-  double (*cost)(Matrix, RowVector);
+  RowVector (*cost)(Matrix, RowVector, map<double, unsigned>);
 
 public:
 	NeuralNetwork() = default;
@@ -27,30 +27,23 @@ public:
 		}
 	}
 
-	void fit(Matrix x, RowVector y) {
+	void fit(Matrix x, RowVector y, map<double, unsigned> mapper) {
 		vector<pair<Matrix, Matrix>> out = {make_pair(Matrix(0, 0), x)};
 
 		// Forward
 		for (auto& layer : this->layers) {
 			Matrix z = MatrixSum(out.back().second * layer.w, layer.b);
 			Matrix a = layer.funct(z);
-			cout << layer << endl << endl;
+			cout << layer << endl;
 
 			out.push_back(make_pair(z, a));
 		}
 
+		RowVector errors = this->cost(out.back().second, y, mapper);
+		cout << errors.sum() / errors.size() << endl;
+
 		// Reverse
 
-		//cout << out.back().first << endl;
-		cout << "Rows: " << out.back().first.rows() << endl;
-		cout << "Cols: " << out.back().first.cols() << endl;
-		cout << "Z: " << out.back().first.row(0) << endl;
-		cout << "A: " << out.back().second.row(0) << endl;
-		cout << "Sum: " << out.back().second.row(0).sum() << endl;
-		cout << endl;
-		//cout << "Calculating cost ...\n";
-		//cout << "Cost: "<< this->cost(out.back().second, y) << endl;
-		//cout << "Finish \n";
 	}
 };
 

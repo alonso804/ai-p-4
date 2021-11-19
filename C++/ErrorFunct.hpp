@@ -10,33 +10,27 @@ using namespace std;
 using Matrix = Eigen::MatrixXd;
 using RowVector = Eigen::RowVectorXd;
 
-double MSE(Matrix y_pred, RowVector y_real) {
-	double result = 0;
+RowVector MSE(Matrix y_pred, RowVector y_real, map<double, unsigned> mapper) {
+	RowVector errors(y_pred.rows());
 
-/*
- *  cout << "Rows: " << y_pred.rows() << endl;
- *  cout << "Cols: " << y_pred.cols() << endl << endl;
- *
- *
- *  cout << "Rows Y: " << y_real.rows() << endl;
- *  cout << "Cols Y: " << y_real.cols() << endl;
- *  for (std::size_t i = 0; i < y_pred.rows(); i++) {
- *    for (std::size_t j = 0; i < y_pred.cols(); j++) {
- *      result += pow(y_pred(i, 0) - y_real[i], 2);
- *    }
- *    //cout << y_pred(i) << endl;
- *  }
- */
-	for (std::size_t i = 0; i < y_pred.size(); i++) {
-		cout << y_pred(i) << endl;
-		result += pow(y_pred(i, 0) - y_real[i], 2);
+	for (int i = 0; i < y_pred.rows(); i++) {
+		unsigned y_pos = mapper[y_real[i]];
+		double mse = 0;
+
+		for (int j = 0; j < y_pred.cols(); j++) {
+			if (j == y_pos) {
+				mse += pow(y_pred(i, j) - 1, 2);
+			} else {
+				mse += pow(y_pred(i, j), 2);
+			}
+		}
+
+		mse /= y_pred.cols();
+
+		errors[i] = mse;
 	}
 
-	result /= y_pred.size();
-
-	result /= y_pred.size();
-
-	return result;
+	return errors;
 }
 
 double MSE_Derivate(Matrix y_pred, RowVector y_real) {

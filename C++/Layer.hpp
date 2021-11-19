@@ -8,6 +8,11 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <cstddef>
+#include <initializer_list>
+#include <set>
+#include <map>
+#include <utility>
 
 #include <eigen3/Eigen/Eigen>
 
@@ -60,6 +65,18 @@ public:
 
 		this->b = Matrix::Random(1, n_neurons);
 		this->w = Matrix::Random(n_connections, n_neurons);
+
+    for (int i = 0; i < this->w.rows(); i++) {
+      for (int j = 0; j < this->w.cols(); j++) {
+        this->w(i, j) = abs(this->w(i, j));
+      }
+    }
+
+    for (int i = 0; i < this->b.rows(); i++) {
+      for (int j = 0; j < this->b.cols(); j++) {
+        this->b(i, j) = abs(this->b(i, j));
+      }
+    }
 	}
 
   friend class NeuralNetwork;
