@@ -11,6 +11,11 @@ class NeuralNetwork {
 	string cost_funct;
 	double learning_rate;
   RowVector (*cost)(Matrix, RowVector, map<double, unsigned>);
+  RowVector (*costD)(Matrix, RowVector, map<double, unsigned>);
+
+	void shape(const Matrix& x) {
+		cout << "(" << x.rows() << ", " << x.cols() << ")" << endl;
+	}
 
 public:
 	NeuralNetwork() = default;
@@ -24,6 +29,7 @@ public:
 
 		if (cost_funct == "mse") {
 			this->cost = &MSE;
+			this->costD = &MSE_Derivate;
 		}
 	}
 
@@ -34,16 +40,36 @@ public:
 		for (auto& layer : this->layers) {
 			Matrix z = MatrixSum(out.back().second * layer.w, layer.b);
 			Matrix a = layer.funct(z);
-			cout << layer << endl;
+			//cout << layer << endl;
 
 			out.push_back(make_pair(z, a));
 		}
 
 		RowVector errors = this->cost(out.back().second, y, mapper);
-		cout << errors.sum() / errors.size() << endl;
+		cout << "Error mean: " << errors.sum() / errors.size() << endl;
 
 		// Reverse
+		//list<double>
+		for (int i = this->layers.size() - 1; i >=0; i--) {
+			Matrix z = out[i + 1].first;
+			Matrix a = out[i + 1].second;
 
+			//cout << i << endl;
+
+			if (i == this->layers.size() - 1) {
+				//shape(a);
+				auto c = this->costD(a, y, mapper);
+				shape(c);
+
+				auto d = this->layers[i].derivative(a);
+				shape(d);
+				auto temp = c * d;
+				cout << temp << endl;
+				shape(temp);
+			} else {
+
+			}
+		}
 	}
 };
 

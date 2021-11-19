@@ -33,9 +33,27 @@ RowVector MSE(Matrix y_pred, RowVector y_real, map<double, unsigned> mapper) {
 	return errors;
 }
 
-double MSE_Derivate(Matrix y_pred, RowVector y_real) {
-	return 0;
-	//return y_pred - y_pred;
+RowVector MSE_Derivate(Matrix y_pred, RowVector y_real, map<double, unsigned> mapper) {
+	RowVector errors(y_pred.rows());
+
+	for (int i = 0; i < y_pred.rows(); i++) {
+		unsigned y_pos = mapper[y_real[i]];
+		double mse = 0;
+
+		for (int j = 0; j < y_pred.cols(); j++) {
+			if (j == y_pos) {
+				mse += y_pred(i, j) - 1;
+			} else {
+				mse += y_pred(i, j);
+			}
+		}
+
+		mse /= y_pred.cols();
+
+		errors[i] = mse;
+	}
+
+	return errors;
 }
 
 #endif //ErrorFunct_H
