@@ -10,7 +10,7 @@ using namespace std;
 using Matrix = Eigen::MatrixXd;
 using RowVector = Eigen::RowVectorXd;
 
-RowVector MSE(Matrix y_pred, RowVector y_real, map<double, unsigned> mapper) {
+RowVector MSE(const Matrix& y_pred, const RowVector& y_real, map<double, unsigned> mapper) {
 	RowVector errors(y_pred.rows());
 
 	for (int i = 0; i < y_pred.rows(); i++) {

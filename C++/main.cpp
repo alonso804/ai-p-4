@@ -1,8 +1,6 @@
 #include "CSV.hpp"
 #include "NeuralNetwork.hpp"
 
-#include "prettyprint.hpp"
-
 map<double, unsigned> countUnique(RowVector y) {
 	set<double> uniques;
 
@@ -56,13 +54,10 @@ int main(int argc, char *argv[]) {
 		make_pair(2, act_f),
 		make_pair(4, act_f),
 		make_pair(8, act_f),
-		make_pair(16, act_f),
-		make_pair(8, act_f),
-		make_pair(4, act_f),
 		make_pair(1, act_f)
 	});
 	
-	NeuralNetwork nn(layers, "mse");
+	NeuralNetwork nn(layers, "mse", 100000, 0.01);
 	nn.fit(x, y, output_mapper);
 	
 	return 0;

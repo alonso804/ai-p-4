@@ -14,6 +14,8 @@
 #include <map>
 #include <utility>
 
+#include "prettyprint.hpp"
+
 #include <eigen3/Eigen/Eigen>
 
 using namespace std;
@@ -101,6 +103,28 @@ Matrix MatrixSum(Matrix w, const Matrix& b) {
   }
 
   return w;
+}
+
+Matrix MatrixProd(Matrix w, const Matrix& b) {
+  for (int i = 0; i < w.rows(); i++) {
+    for (int j = 0; j < w.cols(); j++) {
+      w(i, j) *= b(0, j);
+    }
+  }
+
+  return w;
+}
+
+Matrix mean(const Matrix& delta, unsigned rows, unsigned cols) {
+  Matrix m(rows, cols);
+
+  for (unsigned i = 0; i < rows; i++) {
+    for (unsigned j = 0; j < cols; j++) {
+      m(i, j) = delta.col(j).mean();
+    }
+  }
+  
+  return m;
 }
 
 #endif //Layer_H

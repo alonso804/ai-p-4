@@ -10,7 +10,8 @@ class NeuralNetwork {
 	Layers layers;
 	string cost_funct;
 	double learning_rate;
-  RowVector (*cost)(Matrix, RowVector, map<double, unsigned>);
+	unsigned epochs;
+  RowVector (*cost)(const Matrix&, const RowVector&, map<double, unsigned>);
   RowVector (*costD)(Matrix, RowVector, map<double, unsigned>);
 
 	void shape(const Matrix& x) {
@@ -20,10 +21,11 @@ class NeuralNetwork {
 public:
 	NeuralNetwork() = default;
 
-	NeuralNetwork(Layers layers, string cost_funct, double learning_rate = 0.5) {
+	NeuralNetwork(Layers layers, string cost_funct, unsigned epochs, double learning_rate) {
     assert(cost_funct == "mse");
 
 		this->layers = layers;
+		this->epochs = epochs;
 		this->learning_rate = learning_rate;
 		this->cost_funct = cost_funct;
 
@@ -33,41 +35,61 @@ public:
 		}
 	}
 
-	void fit(Matrix x, RowVector y, map<double, unsigned> mapper) {
+	Matrix train(Matrix x, RowVector y, map<double, unsigned> mapper) {
 		vector<pair<Matrix, Matrix>> out = {make_pair(Matrix(0, 0), x)};
 
 		// Forward
 		for (auto& layer : this->layers) {
 			Matrix z = MatrixSum(out.back().second * layer.w, layer.b);
 			Matrix a = layer.funct(z);
-			//cout << layer << endl;
 
 			out.push_back(make_pair(z, a));
 		}
 
-		RowVector errors = this->cost(out.back().second, y, mapper);
-		cout << "Error mean: " << errors.sum() / errors.size() << endl;
+		/*
+		 *RowVector errors = this->cost(out.back().second, y, mapper);
+		 *cout << "Error mean: " << errors.mean() << endl;
+		 */
 
 		// Reverse
-		//list<double>
+		list<Matrix> deltas;
+		Matrix tempW;
+
 		for (int i = this->layers.size() - 1; i >=0; i--) {
 			Matrix z = out[i + 1].first;
 			Matrix a = out[i + 1].second;
 
-			//cout << i << endl;
-
 			if (i == this->layers.size() - 1) {
-				//shape(a);
-				auto c = this->costD(a, y, mapper);
-				shape(c);
+				RowVector c = this->costD(a, y, mapper);
+				Matrix d = this->layers[i].derivative(a);
 
-				auto d = this->layers[i].derivative(a);
-				shape(d);
-				auto temp = c * d;
-				cout << temp << endl;
-				shape(temp);
+				Matrix res = MatrixProd(c.transpose(), d);
+				deltas.push_front(res);
 			} else {
+				Matrix c = deltas.front() * tempW.transpose();
+				Matrix d = this->layers[i].derivative(a);
+				
+				Matrix res = MatrixProd(c, d);
+				deltas.push_front(res);
+			}
 
+			tempW = this->layers[i].w;
+
+			// Gradient descent
+			unsigned bRows = this->layers[i].b.rows();
+			unsigned bCols = this->layers[i].b.cols();
+			this->layers[i].b -= mean(deltas.front(), bRows, bCols) * learning_rate;
+
+			this->layers[i].w -= (out[i].second.transpose() * deltas.front()) * learning_rate;
+		}
+
+		return out.back().second;
+	}
+
+	void fit(Matrix x, RowVector y, map<double, unsigned> mapper) {
+		for (unsigned i = 0; i < this->epochs; i++) {
+			if (i % 15 == 0) {
+				cout << this->cost(this->train(x, y, mapper), y, mapper).mean() << endl;
 			}
 		}
 	}
