@@ -1,21 +1,7 @@
 #ifndef CSV_H
 #define CSV_H
 
-#include <iostream>
-#include <tuple>
-#include <string>
-#include <fstream>
-#include <vector>
-#include <sstream>
-
-#include <eigen3/Eigen/Eigen>
-
-using namespace std;
-
-using Matrix = Eigen::MatrixXf;
-using RowVector = Eigen::RowVectorXf;
-
-using out_t = tuple<vector<RowVector*>, vector<RowVector*>>;
+#include "Headers.hpp"
 
 class CSV {
 public:
@@ -29,13 +15,13 @@ public:
 		string line;
 		string word;
 
+		unsigned dimensions = -1;
 		if (file.is_open()) {
 			getline(file, line, '\n');
 
 			stringstream ss(line);
 			vector<double> cols;
 
-			unsigned dimensions = -1;
 			while (getline(ss, word, ',')) {
 				dimensions += 1;
 			}
@@ -53,6 +39,7 @@ public:
 					} else {
 						data.back()->coeffRef(i - 1) = double(stof(&word[0]));
 					}
+
 					i++;
 				}
 			}
@@ -61,8 +48,20 @@ public:
 		}
 
 		file.close();
+		Matrix x(data.size(), dimensions);
+		RowVector y(data.size());
 
-		return {data, output};
+		for (int i = 0; i < data.size(); i++) {
+			for (int j = 0; j < dimensions; j++) {
+				x(i, j) = data[i]->coeffRef(j);
+			}
+		}
+
+		for (int i = 0; i < output.size(); i++) {
+			y.coeffRef(i) = output[i]->coeffRef(0);
+		}
+
+		return {x, y};
 	}
 };
 

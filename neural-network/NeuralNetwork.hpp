@@ -1,80 +1,91 @@
 #ifndef NeuralNetwork_H
 #define NeuralNetwork_H
 
-#include "Neuron.hpp"
-#include "ActivationFunctions.hpp"
+#include "Layer.hpp"
+#include "ErrorFunct.hpp"
 
 class NeuralNetwork {
-  vector<Layer> layers;
-  unsigned numLayers;
-  double (*funct)(double);
-  double (*derivative)(double);
-
-  void propagateForward(const RowVector& input) {
-    assert(input.size() == layers[0].size() - 1);
-    
-    for (unsigned i = 0; i < input.size(); i++) {
-      this->layers[0][i].output = input[i];
-    }
-
-    this->layers[0][layers[0].size() - 1].output = 1;
-
-    for (unsigned layerIdx = 1; layerIdx < this->numLayers; layerIdx++) {
-      Layer* prevLayer = &this->layers[layerIdx - 1];
-      for (unsigned neuronIdx = 0; neuronIdx < this->layers[layerIdx].size() - 1; neuronIdx++) {
-        this->layers[layerIdx][neuronIdx].forward(prevLayer, funct);
-      }
-    }
-  }
-
-  void propagateBackward() {
-
-  }
+	Layers layers;
+	string cost_funct;
+	double alpha;
+	unsigned epochs;
+  double (*costF)(const Matrix&, const unsigned&);
+  Matrix (*costD)(Matrix, const unsigned&);
 
 public:
-  NeuralNetwork(const vector<unsigned>& topology, const string& functName) {
-    assert(functName == "tanh" || functName == "sigmoide" || functName == "relu");
+	NeuralNetwork() = default;
 
-    if (functName == "tanh") {
-      this->funct = &Tanh;
-      this->derivative = &TanhDerivative;
-    }
+	NeuralNetwork(Layers layers, string cost_funct, unsigned epochs, double alpha) {
+    assert(cost_funct == "mse");
 
-    if (functName == "sigmoide") {
-      this->funct = &Sigmoide;
-      this->derivative = &SigmoideDerivate;
-    }
+		this->layers = layers;
+		this->epochs = epochs;
+		this->alpha = alpha;
+		this->cost_funct = cost_funct;
 
-    if (functName == "relu") {
-      this->funct = &RELU;
-      this->derivative = &RELUDerivate;
-    }
+		if (cost_funct == "mse") {
+			this->costF = &MSE;
+			this->costD = &MSE_Derivate;
+		}
+	}
 
-    this->numLayers = topology.size();
+	Matrix train(const Matrix& x, unsigned& y_idx) {
+		Charges out = {x};
 
-    for (unsigned layerIdx = 0; layerIdx < numLayers; layerIdx++) {
-      layers.push_back(Layer());
-      unsigned numOutputs = layerIdx == numLayers - 1 ? 0 : topology[layerIdx + 1];
+		for (auto& layer : this->layers) {
+			//cout << layer << endl;
+			//shape(out.back());
+			//shape(layer.w);
+			Matrix z = MatrixSum(out.back() * layer.w, layer.b);
+			Matrix a = layer.actF(z);
 
-      for (unsigned neuronIdx = 0; neuronIdx <= topology[layerIdx]; neuronIdx++) {
-        layers.back().push_back(Neuron(numOutputs, neuronIdx));
-      }
-    }
-  }
+			out.push_back(a);
+		}
 
-  void fit(const vector<RowVector*>& inputs, vector<RowVector*> outputs) {
-    for (unsigned i = 0; i < outputs.size(); i++) {
-      this->propagateForward(*inputs[i]);
-      for (auto i : this->layers[this->layers.size() - 1]) {
-        cout << i.output << endl;
-      }
-      cout << endl;
-    }
+		list<Matrix> deltas;
+		Matrix tempW;
 
-    //cout << this->layers[this->layers.size() - 1].size() << endl;
-  }
+		for (int i = this->layers.size() - 1; i >=0; i--) {
+			Matrix a = out[i + 1];
 
-  virtual ~NeuralNetwork() {}
+			if (i == this->layers.size() - 1) {
+				Matrix c = this->costD(a, y_idx);
+				Matrix d = this->layers[i].actD(a);
+
+				Matrix delta = MatrixProd(c, d);
+				deltas.push_front(delta);
+
+			} else {
+
+				Matrix c = deltas.front() * tempW.transpose();
+				Matrix d = this->layers[i].actD(a);
+
+				Matrix delta = MatrixProd(c, d);
+				deltas.push_front(delta);
+			}
+
+			tempW = this->layers[i].w;
+
+			this->layers[i].w -= out[i].transpose() * deltas.front() * alpha;
+			this->layers[i].b -= deltas.front() * alpha;
+		}
+
+		return out.back();
+	}
+
+	void fit(const Matrix& x, const RowVector& y, Mapper& mapper) {
+		for (unsigned epoch = 0; epoch < this->epochs; epoch++) {
+			for (int i = 0; i < x.rows(); i++) {
+				Matrix out_layer = train(x.row(i), mapper[y[i]]);
+
+				double error = this->costF(out_layer, mapper[y[i]]);
+				if (i == x.rows() - 1) {
+				//if (i % 50 == 0) {
+					cout << error << endl;
+				}
+			}
+		}
+	}
 };
 
 #endif //NeuralNetwork_H

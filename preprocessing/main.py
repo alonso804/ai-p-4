@@ -20,6 +20,7 @@ def normalize(data):
 
 def preprocessing(dataset, outputfile, shuffle=False):
     df = pd.read_csv(dataset)
+    df = df.dropna()
     df.iloc[:, 1:] = normalize(df.iloc[:, 1:])
 
     if shuffle == True:
