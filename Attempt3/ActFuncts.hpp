@@ -83,4 +83,15 @@ Matrix SoftMaxF(Matrix z) {
 	return z;
 }
 
+Matrix SoftMaxD(Matrix a) {
+	for (int i = 0; i < a.rows(); i++) {
+		for (int j = 0; j < a.cols(); j++) {
+			a(i, j) = a(i, j) * (1 - a(i, j));
+		}
+
+	}
+
+	return a;
+}
+
 #endif //ActFuncts_H

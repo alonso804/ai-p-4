@@ -33,14 +33,14 @@ public:
 		Charges out = {x};
 
 		for (auto& layer : this->layers) {
+			//cout << layer << endl;
+			//shape(out.back());
+			//shape(layer.w);
 			Matrix z = MatrixSum(out.back() * layer.w, layer.b);
 			Matrix a = layer.actF(z);
 
 			out.push_back(a);
 		}
-
-		//double error = this->costF(out.back(), y_idx);
-		//deb(error);
 
 		list<Matrix> deltas;
 		Matrix tempW;
@@ -56,7 +56,8 @@ public:
 				deltas.push_front(delta);
 
 			} else {
-				Matrix c = deltas.front() * this->layers[i].w.transpose();
+
+				Matrix c = deltas.front() * tempW.transpose();
 				Matrix d = this->layers[i].actD(a);
 
 				Matrix delta = MatrixProd(c, d);
@@ -79,10 +80,10 @@ public:
 
 				double error = this->costF(out_layer, mapper[y[i]]);
 				if (i == x.rows() - 1) {
+				//if (i % 50 == 0) {
 					cout << error << endl;
 				}
 			}
-			//cout << "Epoch!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 		}
 	}
 };
