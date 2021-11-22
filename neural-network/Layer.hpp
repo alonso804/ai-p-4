@@ -40,7 +40,7 @@ public:
 
     if (act_f == "softmax") {
       this->actF = &SoftMaxF;
-      this->actD = &SoftMaxD; //TODO: SoftMaxDerivative
+      this->actD = &SoftMaxD;
     }
 
 		this->n_connections = n_connections;
