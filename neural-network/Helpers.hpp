@@ -2,7 +2,6 @@
 #define Helpers_H
 
 #include "Headers.hpp"
-#define name(x) cout << #x
 
 Mapper countUnique(RowVector y) {
 	set<double> uniques;
@@ -68,18 +67,6 @@ Matrix MatrixProd(const double& d, Matrix x) {
   }
 
   return x;
-}
-
-Matrix mean(const Matrix& delta, unsigned rows, unsigned cols) {
-  Matrix m(rows, cols);
-
-  for (unsigned i = 0; i < rows; i++) {
-    for (unsigned j = 0; j < cols; j++) {
-      m(i, j) = delta.col(j).mean();
-    }
-  }
-  
-  return m;
 }
 
 #endif //Helpers_H
